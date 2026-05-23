@@ -357,10 +357,7 @@
   /* Ensure all content sits above canvas */
   nav, .status-bar, #hero, section { position: relative; z-index: 2; }
 
-  /* Parallax layers */
-  .parallax-slow  { will-change: transform; }
-  .parallax-med   { will-change: transform; }
-  .parallax-fast  { will-change: transform; }
+
 
   /* Scramble text highlight */
   .scramble {
@@ -925,11 +922,11 @@
 
 <!-- Hero -->
 <div id="hero">
-  <p class="hero-prefix parallax-slow">// hello, world</p>
+  <p class="hero-prefix">// hello, world</p>
   <h1 class="hero-name">
     <div class="glitch-text" data-text="Dibya Joshi">Dibya Joshi</div>
   </h1>
-  <p class="hero-role parallax-med">Associate Engineering Manager &amp; <span>Senior Software Engineer</span></p>
+  <p class="hero-role">Associate Engineering Manager &amp; <span>Senior Software Engineer</span></p>
 
   <div class="typing-container">
     <span>$ whoami &nbsp;→ &nbsp;</span><span class="typing-text" id="typingEl"></span><span class="cursor-blink"></span>
@@ -964,8 +961,8 @@
   <div class="section-label"><span class="num">01.</span> About</div>
   <div class="about-grid reveal">
     <div class="about-text">
-      <p>Software Engineer with over <strong>6 years of experience</strong> designing, developing, and deploying web-based applications — now leading engineering teams as an Associate Engineering Manager at Cedar Gate Technologies.</p>
-      <p>I specialize in <strong>US Healthcare systems</strong> — working with EDI standards (837, 835, 834), claims processing, and applications that handle millions of transactions per day. Certified in US Healthcare by Cedar Gate.</p>
+      <p>Software Engineer with over <strong>6 years of experience</strong> designing, developing, and deploying web-based applications — now leading engineering teams as an Associate Engineering Manager in the healthcare tech space.</p>
+      <p>I specialize in <strong>US Healthcare systems</strong> — working with EDI standards (837, 835, 834), claims processing, and applications that handle millions of transactions per day. Certified in US Healthcare domain knowledge.</p>
       <p>Before healthcare tech, I built large-scale <strong>government systems</strong> for Nepal — including the Central Billing Management System for the Inland Revenue Department, an ERP for ICAN, and social security platforms. I believe in clean architecture, meaningful collaboration, and software that actually works at scale.</p>
     </div>
     <div class="about-stats">
@@ -979,7 +976,7 @@
       </div>
       <div class="stat-item" data-index="03">
         <div class="stat-num">4.5yr</div>
-        <div class="stat-label">@ Cedar Gate</div>
+        <div class="stat-label">Current Role</div>
       </div>
       <div class="stat-item" data-index="04">
         <div class="stat-num">M+</div>
@@ -995,7 +992,7 @@
   <div class="projects-grid reveal">
     <div class="project-card">
       <div class="project-num">001</div>
-      <h3 class="project-title">Cedar Gate Healthcare Platform</h3>
+      <h3 class="project-title">Healthcare Claims Platform</h3>
       <p class="project-desc">Complex US healthcare application handling millions of transactions and claims per day. Implements EDI standards 837, 835 & 834 for claims submission, remittance, and enrollment.</p>
       <div class="project-tags">
         <span class="tag">ASP.NET</span>
@@ -1054,7 +1051,7 @@
     <div class="project-card">
       <div class="project-num">006</div>
       <h3 class="project-title">Engineering Leadership</h3>
-      <p class="project-desc">Currently managing cross-functional engineering teams at Cedar Gate, driving agile delivery, technical mentorship, and architecture decisions for mission-critical healthcare software.</p>
+      <p class="project-desc">Currently managing cross-functional engineering teams, driving agile delivery, technical mentorship, and architecture decisions for mission-critical healthcare software.</p>
       <div class="project-tags">
         <span class="tag">Team Lead</span>
         <span class="tag">Agile</span>
@@ -1215,44 +1212,6 @@
     });
   }
   initScramble();
-
-  /* ── 3. PARALLAX SCROLL ── */
-  (function() {
-    const layers = [
-      { selector: '.parallax-slow', speed: 0.12 },
-      { selector: '.parallax-med',  speed: 0.22 },
-      { selector: '.parallax-fast', speed: 0.38 },
-      { selector: '.hero-name',     speed: 0.18 },
-      { selector: '.typing-container', speed: 0.28 },
-      { selector: '.hero-cta',      speed: 0.32 },
-      { selector: '.terminal-box',  speed: 0.08 },
-    ];
-
-    // Only run parallax on desktop (skip on mobile for perf)
-    if (isTouchDevice) return;
-
-    let ticking = false;
-    function applyParallax() {
-      const scrollY = window.scrollY;
-      layers.forEach(({ selector, speed }) => {
-        document.querySelectorAll(selector).forEach(el => {
-          // Only parallax elements within or near the hero
-          const rect = el.getBoundingClientRect();
-          const centerY = rect.top + rect.height / 2;
-          if (centerY > window.innerHeight * 1.5 || centerY < -window.innerHeight) return;
-          el.style.transform = `translateY(${scrollY * speed}px)`;
-        });
-      });
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(applyParallax);
-        ticking = true;
-      }
-    }, { passive: true });
-  })();
 
   /* ── CURSOR ── */
   const cursor = document.getElementById('cursor');
