@@ -103,10 +103,30 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 100;
-    border-bottom: 1px solid var(--border);
-    background: rgba(10,10,10,0.9);
-    backdrop-filter: blur(10px);
+    z-index: 200;
+    border-bottom: 1px solid transparent;
+    background: rgba(10,10,10,0);
+    backdrop-filter: blur(0px);
+    transition: padding 0.3s ease, background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+  }
+
+  nav.scrolled {
+    padding: 12px 48px;
+    background: rgba(10,10,10,0.95);
+    border-bottom-color: var(--border);
+    backdrop-filter: blur(12px);
+  }
+
+  /* Scroll progress bar */
+  #scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--accent);
+    z-index: 300;
+    transition: width 0.05s linear;
+    box-shadow: 0 0 8px var(--accent);
   }
 
   .nav-logo {
@@ -142,6 +162,8 @@
 
   .nav-links a:hover { color: var(--text); }
   .nav-links a:hover::before { opacity: 1; }
+  .nav-links a.active { color: var(--accent); }
+  .nav-links a.active::before { opacity: 1; }
 
   /* Status bar */
   .status-bar {
@@ -359,7 +381,17 @@
 
 
 
-  /* Scramble text highlight */
+  /* Cursor trail */
+  .trail-dot {
+    position: fixed;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9990;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.05s;
+  }
   .scramble {
     display: inline-block;
     transition: color 0.1s;
@@ -897,6 +929,7 @@
 </head>
 <body>
 
+<div id="scroll-progress"></div>
 <canvas id="matrix-canvas"></canvas>
 
 <div class="cursor" id="cursor"></div>
@@ -1212,6 +1245,69 @@
     });
   }
   initScramble();
+
+  /* ── CURSOR TRAIL ── */
+  if (!isTouchDevice) {
+    const TRAIL_LENGTH = 18;
+    const trail = Array.from({ length: TRAIL_LENGTH }, (_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'trail-dot';
+      const scale = 1 - i / TRAIL_LENGTH;
+      dot.style.width  = (5 * scale) + 'px';
+      dot.style.height = (5 * scale) + 'px';
+      dot.style.opacity = (1 - i / TRAIL_LENGTH) * 0.6;
+      document.body.appendChild(dot);
+      return dot;
+    });
+
+    const trailPositions = Array(TRAIL_LENGTH).fill({ x: 0, y: 0 });
+    let trailMx = 0, trailMy = 0;
+
+    document.addEventListener('mousemove', e => {
+      trailMx = e.clientX;
+      trailMy = e.clientY;
+    });
+
+    function animateTrail() {
+      trailPositions.unshift({ x: trailMx, y: trailMy });
+      trailPositions.length = TRAIL_LENGTH;
+      trail.forEach((dot, i) => {
+        const pos = trailPositions[i] || trailPositions[trailPositions.length - 1];
+        dot.style.left = pos.x + 'px';
+        dot.style.top  = pos.y + 'px';
+      });
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+  }
+
+  /* ── NAV SCROLL BEHAVIOR + ACTIVE LINKS ── */
+  const nav = document.querySelector('nav');
+  const progressBar = document.getElementById('scroll-progress');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const sections = document.querySelectorAll('section, #hero');
+
+  function onScroll() {
+    // Shrink nav
+    if (window.scrollY > 40) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+
+    // Scroll progress
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (window.scrollY / docH * 100) + '%';
+
+    // Active nav link
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
   /* ── CURSOR ── */
   const cursor = document.getElementById('cursor');
